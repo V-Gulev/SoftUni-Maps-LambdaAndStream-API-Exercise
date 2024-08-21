@@ -4,34 +4,9 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[] words = scanner.nextLine().split(" ");
-
-        LinkedHashMap<String, Integer> counts = new LinkedHashMap<>();
-
+        String[] words = Arrays.stream(scanner.nextLine().split(" ")).filter(w -> w.length() % 2 == 0).toArray(String[]::new);
         for (String word : words) {
-            String lowerCase = word.toLowerCase();
-
-            if (counts.containsKey(lowerCase)) {
-                counts.put(lowerCase, counts.get(lowerCase) +1);
-            } else {
-                counts.put(lowerCase, 1);
-            }
-        }
-
-        ArrayList<String> odds = new ArrayList<>();
-
-
-        for (var entry : counts.entrySet()) {
-            if (entry.getValue() % 2 == 1) {
-                odds.add(entry.getKey());
-            }
-        }
-
-        for (int i = 0; i < odds.size(); i++) {
-            System.out.print(odds.get(i));
-            if (i < odds.size() - 1) {
-                System.out.print(", ");
-            }
+            System.out.println(word);
         }
     }
 }
