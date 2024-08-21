@@ -5,19 +5,21 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        double[] nums = Arrays.stream(scanner.nextLine().split(" ")).mapToDouble(Double::parseDouble).toArray();
-        TreeMap<Double, Integer> count =new TreeMap<>();
+        LinkedHashMap<String, ArrayList<String>> words = new LinkedHashMap<>();
+        int times = Integer.parseInt(scanner.nextLine());
 
-        for (double num : nums) {
-            if (!count.containsKey(num)) {
-                count.put(num, 0);
-            }
-            count.put(num, count.get(num) + 1);
+        for (int i = 0; i < times; i++) {
+            String word = scanner.nextLine();
+            String synonym = scanner.nextLine();
+
+            words.putIfAbsent(word, new ArrayList<>());
+            words.get(word).add(synonym);
+
         }
-
-        for (Map.Entry<Double, Integer> entry : count.entrySet()) {
-            DecimalFormat df = new DecimalFormat("#.#######");
-            System.out.printf("%s -> %d%n" ,df.format(entry.getKey()), entry.getValue());
+        for (Map.Entry<String, ArrayList<String>> entry : words.entrySet()) {
+            String word = entry.getKey();
+            ArrayList<String> synonyms = entry.getValue();
+            System.out.println(word + " - " + String.join(", ", synonyms));
         }
     }
 }
