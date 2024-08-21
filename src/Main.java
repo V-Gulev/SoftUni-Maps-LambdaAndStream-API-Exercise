@@ -1,25 +1,37 @@
-import java.text.DecimalFormat;
 import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        LinkedHashMap<String, ArrayList<String>> words = new LinkedHashMap<>();
-        int times = Integer.parseInt(scanner.nextLine());
+        String[] words = scanner.nextLine().split(" ");
 
-        for (int i = 0; i < times; i++) {
-            String word = scanner.nextLine();
-            String synonym = scanner.nextLine();
+        LinkedHashMap<String, Integer> counts = new LinkedHashMap<>();
 
-            words.putIfAbsent(word, new ArrayList<>());
-            words.get(word).add(synonym);
+        for (String word : words) {
+            String lowerCase = word.toLowerCase();
 
+            if (counts.containsKey(lowerCase)) {
+                counts.put(lowerCase, counts.get(lowerCase) +1);
+            } else {
+                counts.put(lowerCase, 1);
+            }
         }
-        for (Map.Entry<String, ArrayList<String>> entry : words.entrySet()) {
-            String word = entry.getKey();
-            ArrayList<String> synonyms = entry.getValue();
-            System.out.println(word + " - " + String.join(", ", synonyms));
+
+        ArrayList<String> odds = new ArrayList<>();
+
+
+        for (var entry : counts.entrySet()) {
+            if (entry.getValue() % 2 == 1) {
+                odds.add(entry.getKey());
+            }
+        }
+
+        for (int i = 0; i < odds.size(); i++) {
+            System.out.print(odds.get(i));
+            if (i < odds.size() - 1) {
+                System.out.print(", ");
+            }
         }
     }
 }
