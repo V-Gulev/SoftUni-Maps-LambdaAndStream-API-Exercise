@@ -3,64 +3,62 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Map<String, String> contests = new HashMap<>();
-        Map<String, Map<String, Integer>> people = new TreeMap<>();
-
-
-        while (true) {
-            String input = scanner.nextLine();
-            if (input.equals("end of contests")) {
-                break;
-            }
-            String[] data = input.split(":");
-            contests.put(data[0], data[1]);
-        }
+        Map<String, Map<String, Integer>> contests = new LinkedHashMap<>();
+        Map<String, Integer> stats = new HashMap<>();
 
         while (true) {
             String input = scanner.nextLine();
-            if (input.equals("end of submissions")) {
+            if (input.equals("no more time")) {
                 break;
             }
-            String[] data = input.split("=>");
-            String contestType = data[0];
-            String password = data[1];
-            String name = data[2];
-            int points = Integer.parseInt(data[3]);
+            String[] tokens = input.split(" -> ");
+            String name = tokens[0];
+            String contest = tokens[1];
+            int points = Integer.parseInt(tokens[2]);
 
+            contests.putIfAbsent(contest, new LinkedHashMap<>());
+            contests.get(contest).putIfAbsent(name, 0);
 
-            if (contests.containsKey(contestType) && contests.get(contestType).equals(password)) {
-                people.putIfAbsent(name, new HashMap<>());
-                Map<String, Integer> userContests = people.get(name);
-
-                userContests.put(contestType, Math.max(userContests.getOrDefault(contestType, 0), points));
+            if (contests.get(contest).get(name) < points) {
+                stats.put(name, stats.getOrDefault(name, 0) + points - contests.get(contest).get(name));
+                contests.get(contest).put(name, points);
             }
         }
 
-        String bestUser = "";
-        int bestPoints = 0;
+        for (String contest : contests.keySet()) {
+            System.out.printf("%s: %d participants%n", contest, contests.get(contest).size());
 
-        for (Map.Entry<String, Map<String, Integer>> userEntry : people.entrySet()) {
-            int totalPoints = userEntry.getValue().values().stream().mapToInt(Integer::intValue).sum();
+            List<Map.Entry<String, Integer>> sortedParticipants = new ArrayList<>(contests.get(contest).entrySet());
+            sortedParticipants.sort((a, b) -> {
+                int result = b.getValue().compareTo(a.getValue());
+                if (result == 0) {
+                    return a.getKey().compareTo(b.getKey());
+                }
+                return result;
+            });
 
-            if (totalPoints > bestPoints) {
-                bestPoints = totalPoints;
-                bestUser = userEntry.getKey();
+            int position = 1;
+            for (Map.Entry<String, Integer> participant : sortedParticipants) {
+                System.out.printf("%d. %s <::> %d%n", position, participant.getKey(), participant.getValue());
+                position++;
             }
         }
 
+        System.out.println("Individual standings:");
 
-        System.out.printf("Best candidate is %s with total %d points.%n", bestUser, bestPoints);
+        List<Map.Entry<String, Integer>> sortedStats = new ArrayList<>(stats.entrySet());
+        sortedStats.sort((a, b) -> {
+            int result = b.getValue().compareTo(a.getValue());
+            if (result == 0) {
+                return a.getKey().compareTo(b.getKey());
+            }
+            return result;
+        });
 
-        System.out.println("Ranking:");
-        for (Map.Entry<String, Map<String, Integer>> userEntry : people.entrySet()) {
-            System.out.println(userEntry.getKey());
-
-            userEntry.getValue().entrySet()
-                    .stream()
-                    .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
-                    .forEach(contestEntry ->
-                            System.out.printf("#  %s -> %d%n", contestEntry.getKey(), contestEntry.getValue())
-                    );
+        int position = 1;
+        for (Map.Entry<String, Integer> entry : sortedStats) {
+            System.out.printf("%d. %s -> %d%n", position, entry.getKey(), entry.getValue());
+            position++;
         }
     }
 }
